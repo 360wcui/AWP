@@ -57,9 +57,11 @@ if __name__ == '__main__':
 	# print(' spice.reclat', radial2, lon2 * 180/np.pi, lat2 * 180/np.pi)
 	print('cart2lat', nt.cart2lat(initial, 'J2000', 'IAU_EARTH', [ets] ))  # should match launch site lat/lng again
 
-
 	for coes in coes_list:
-		state0      = oc.coes2state( coes )
+		# print('Determine the state', state0)
+		state0      = [x0, y0, z0, vx0, vy0, vz0]
+		# state0      = oc.coes2state( coes )
+
 		print('state0', state0)
 		ets, states = nt.propagate_ode(
 			oc.two_body_ode, state0, tspan, dt )

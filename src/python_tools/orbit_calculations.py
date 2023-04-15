@@ -78,7 +78,7 @@ def coes2state( coes, mu = pd.earth[ 'mu' ], deg = True ):
 		raan *= nt.d2r
 
 	rp = a * ( 1 - e )
-
+	# spice.conics determine states (position, velocity)
 	return spice.conics( [ rp, e, i, raan, aop, ta, 0, mu], 0 )
 
 def state2ap( state, mu = pd.earth[ 'mu' ] ):
@@ -99,6 +99,16 @@ def two_body_ode( t, state, mu = pd.earth[ 'mu' ] ):
 	return np.array( [
 		state[ 3 ], state[ 4 ], state[ 5 ],
 		    a[ 0 ],     a[ 1 ],     a[ 2 ] ] )
+
+def rocket_trajectory( t, air_density, dynamics_pressure, state, mu = pd.earth[ 'mu' ] ):
+	# state = [ rx, ry, rz, vx, vy, vz ]
+
+	r = state[ :3 ]
+	# a = -mu * r / np.linalg.norm( r ) ** 3
+
+	return np.array( [
+		state[ 3 ], state[ 4 ], state[ 5 ],
+		a[ 0 ],     a[ 1 ],     a[ 2 ] ] )
 
 def calc_close_approach( turn_angle, v_inf, mu = pd.sun[ 'mu' ] ):
 	'''
