@@ -28,39 +28,38 @@ ay = np.zeros((samples, 1))
 dm = 2e4  # each falcon 9 engine uses 230 kg fuel
 
 m = np.zeros((samples, 1)) #400 tonne
-m[1] = 4.21e6
+m[0] = 4.21e6
 
 hh = np.zeros((samples, 1))
 time = np.linspace(0, time_cover, samples)
 dt = time_cover/(samples - 1)
 initial_turn = 150
 engine_cutoff = 210
-for i in range(2, samples, 1):
+for i in range(1, samples, 1):
     if i < initial_turn:
         m[i] = m[i-1] - dm
-        V = np.sqrt(Vx[i - 1]^2 + Vy[i - 1]^2)
+        V = np.sqrt(np.power(Vx[i - 1],2) + np.power(Vy[i - 1],2))
         ay[i] = -g  + dm * ue/m[i-1]
         # % ay[i] = -g  + Vy[i-1]/abs(Vy[i-1])*dm * ue/m[i-1]
         ax[i] = 0
     elif i == initial_turn:
         m[i] = m[i-1] - dm
         theta = .1
-        V = np.sqrt(Vx[i - 1]^2 + Vy[i - 1]^2)
+        V = np.sqrt(np.power(Vx[i - 1],2) + np.power(Vy[i - 1],2))
         a =  dm * ue/m[i-1]
         ay[i] = -g + a * np.cos(theta)
-        ax[i] = a * sin(theta)
+        ax[i] = a * np.sin(theta)
     elif i < engine_cutoff:
         m[i] = m[i-1] - dm
-        theta = np.atan2(abs(ry[i] - ry[i - 1]), abs(rx[i] - rx[i - 1]))
-        V = np.sqrt(Vx[i - 1]^2 + Vy[i - 1]^2)
+        theta = np.arctan2(abs(ry[i] - ry[i - 1]), abs(rx[i] - rx[i - 1]))
+        V = np.sqrt(np.power(Vx[i - 1],2) + np.power(Vy[i - 1],2))
         a = dm * ue/m[i-1]
         ay[i] = -g + a * np.cos(theta)
-
-        ax[i] = a * sin(theta)
+        ax[i] = a * np.sin(theta)
     else:
         m[i] = m[i-1]
-        theta = np.atan2(abs(ry[i] - ry[i - 1]), abs(rx[i] - rx[i - 1]))
-        V = np.sqrt(Vx[i - 1]^2 + Vy[i - 1]^2)
+        theta = np.arctan2(abs(ry[i] - ry[i - 1]), abs(rx[i] - rx[i - 1]))
+        V = np.sqrt(np.power(Vx[i - 1],2) + np.power(Vy[i - 1],2))
         a = 0
         ay[i] = -g*0.8 + a * np.cos(theta)
         ax[i] = a * np.sin(theta)
@@ -72,14 +71,16 @@ for i in range(2, samples, 1):
 
 
 fig, (ax1, ax2) = plt.subplots(2, 1)
-fig.suptitle('rx and ry')
 
 ax1.plot(rx / 1000, ry / 1000, 'o-')
 ax1.set_ylabel('(km)')
+ax1.set_xlabel('(km)')
 
-ax2.plot(time, a, '.-')
-ax2.set_xlabel('(km)')
-ax2.set_ylabel('(km)')
+ax2.plot(time, m, '.-')
+ax2.set_xlabel('Time(s)')
+ax2.set_ylabel('mass (kg)')
+# ax2.set_xlabel('(km)')
+# ax2.set_ylabel('(km)')
 
 plt.show()
 
