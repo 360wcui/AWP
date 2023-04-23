@@ -21,7 +21,7 @@ rho = p0 * M / R / T0 * np.power((1 - L*h/T0),(g*M/R/L - 1))
 V = 0.001 * np.ones((samples, 1))
 a = np.zeros((samples, 1))
 
-dm = 1.4e4
+dm = 2e4
 
 m = 2.8e6 * np.ones((samples, 1))
 h = np.zeros((samples, 1))
@@ -29,7 +29,9 @@ time = np.linspace(0, time_cover, samples)
 dt = time_cover/(samples - 1)
 for i in range(samples):
     m[i] = m[i-1] - dm
-    a[i] = -g - 0.5*rho[i-1]*V[i-1]*abs(V[i-1])*Cd*A/m[i-1] + V[i-1]/abs(V[i-1])*dm * ue/m[i-1]
+    if m[i] <= 0:
+        print("zero mass")
+    a[i] = -g - 0.5*rho[i-1]*V[i-1]*V[i-1]*Cd*A/m[i-1] + dm * ue/m[i-1]
     V[i] = V[i-1] + (a[i])*dt
 
 

@@ -56,17 +56,17 @@ if __name__ == '__main__':
 	# radial2, lon2, lat2 = spice.reclat([x0, y0, z0])
 	# print(' spice.reclat', radial2, lon2 * 180/np.pi, lat2 * 180/np.pi)
 	print('cart2lat', nt.cart2lat(initial, 'J2000', 'IAU_EARTH', [ets] ))  # should match launch site lat/lng again
-
+	m0 = 4.21e6
 	for coes in coes_list:
 		# print('Determine the state', state0)
-		state0      = [x0, y0, z0, vx0, vy0, vz0]
+		state0  = [x0, y0, z0, vx0, vy0, vz0]
 		# state0      = oc.coes2state( coes )
 
 		print('state0', state0)
 		ets, states = nt.propagate_ode(
-			oc.two_body_ode, state0, tspan, dt )
+			oc.two_body_ode, state0, tspan, dt)
 
-		states_list.append( states )
+		states_list.append( states[:, :6] )
 
 	pt.plot_orbits( states_list, {
 		'labels'  : [ '0', '45', '75', '100' ],
@@ -104,7 +104,8 @@ if __name__ == '__main__':
 		else:
 			print("The file does not exist")
 
-
+		print('states list [0] length', len(states_list[0]))
+		print('ets shape', ets.shape)
 		st.write_bsp( ets, states_list[ 0 ], {
 			'bsp_fn': 'many-orbits.bsp',
 			'spice_id': -999,

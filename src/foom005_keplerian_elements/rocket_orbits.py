@@ -71,7 +71,8 @@ if __name__ == '__main__':
 		import spice_tools  as st
 		spice.furnsh( sd.leapseconds_kernel )
 
-
+		print('states list [0] length', len(states_list[0]))
+		print('ets shape', ets.shape)
 		st.write_bsp( ets, states_list[ 0 ], {
 			'bsp_fn': 'many-orbits.bsp',
 			'spice_id': -999,
