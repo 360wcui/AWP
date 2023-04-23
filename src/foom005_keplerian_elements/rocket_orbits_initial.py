@@ -45,9 +45,9 @@ if __name__ == '__main__':
 	print('r_ecef', r_ecef)
 	print('rj2000', r_j2000)
 	# print('x0, y0, z0', x0, y0, z0)
-	vx0 = -10
-	vy0 = 60
-	vz0 = 0
+	vx0 = 0
+	vy0 = 0
+	vz0 = 10
 	x0, y0, z0 = r_j2000
 
 	initial = np.array([[x0, y0, z0]])
@@ -98,16 +98,18 @@ if __name__ == '__main__':
 	if True:
 		import spice_tools  as st
 		spice.furnsh( sd.leapseconds_kernel )
+		cosmos_folder = '/Users/wcui/workspace/cosmo-demos/scenes/ct100_646/geo_inertial'
 		file = 'many-orbits.bsp'
-		if os.path.exists(file):
-			os.remove(file)
+		full_path = os.path.join(cosmos_folder, file)
+		if os.path.exists(full_path):
+			os.remove(full_path)
 		else:
 			print("The file does not exist")
 
 		print('states list [0] length', len(states_list[0]))
 		print('ets shape', ets.shape)
 		st.write_bsp( ets, states_list[ 0 ], {
-			'bsp_fn': 'many-orbits.bsp',
+			'bsp_fn': full_path,
 			'spice_id': -999,
 		} )
 
