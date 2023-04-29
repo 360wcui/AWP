@@ -25,21 +25,23 @@ if __name__ == '__main__':
 
 	coes_list   = []
 	states_list = []
-	tspan       = 24 * 3600.0 * 7
+	tspan       = 24 * 3600.0 * 0.1
 	dt          = 10.0
 
-	coes_list.append( [ 25000.0, 0.4, 30,  0, 0,   30  ] )
+	ets_start_time = '2021-12-26, 6:00:00 A.M.'
+
+	coes_list.append( [ 25000.0, 0.4, 30,  0, 0,   30 ] )
 	# coes_list.append( [ 15000.0, 0.4, 30,  0, 40,  60  ] )
 	# coes_list.append( [ 15000.0, 0.4, 75,  0, 270, 60  ] )
 	# coes_list.append( [ 15000.0, 0.4, 100, 0, 270, 100 ] )
-	radial0, lat0, lon0 = 7000, 28.396837 / 180 * np.pi, -80.605659 / 180 * np.pi
+	radial0, lat0, lon0 = 6370, 28.396837 / 180 * np.pi, -80.605659 / 180 * np.pi
 	# radial0, lat0, lon0 = 403626.33, -18.2656 / 180 * np.pi, -98.3495 / 180 * np.pi
 # Radius     (km):      403626.33912495
 # Longitude (deg):         -98.34959789
 # Latitude  (deg):         -18.26566077
 	r_ecef = spice.latrec(radial0, lon0, lat0)
 	print('r_ecef', r_ecef)
-	ets = spice.str2et( '2021-12-26')
+	ets = spice.str2et( ets_start_time)
 	Q = spice.pxform('IAU_EARTH', 'J2000', ets)
 	r_j2000 = np.matmul(Q, r_ecef)
 	print('r_ecef', r_ecef)
@@ -59,15 +61,15 @@ if __name__ == '__main__':
 	m0 = 4.21e6
 	for coes in coes_list:
 		# print('Determine the state', state0)
-		state0  = [x0, y0, z0, vx0, vy0, vz0]
+		state0  = [x0, y0, z0, vx0, vy0, vz0, m0]
 		# state0      = oc.coes2state( coes )
 
 		print('state0', state0)
 		ets, states = nt.propagate_ode(
-			oc.two_body_ode, state0, tspan, dt)
+			oc.rocket_trajectory, state0, tspan, dt)
 
 		states_list.append( states[:, :6] )
-
+	print(states_list)
 	pt.plot_orbits( states_list, {
 		'labels'  : [ '0', '45', '75', '100' ],
 		'colors'  : [ 'crimson', 'lime', 'c', 'm' ],
@@ -75,7 +77,7 @@ if __name__ == '__main__':
 		'show'    : True
 	} )
 
-	ets    += spice.str2et( '2021-12-26' )
+	ets    += spice.str2et( ets_start_time)
 	latlons = []
 	for states in states_list:
 		latlons.append( nt.cart2lat(

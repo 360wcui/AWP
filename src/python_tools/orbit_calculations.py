@@ -129,7 +129,7 @@ def rocket_trajectory(t, state, mu=pd.earth['mu']):
     rho = p0 * M / R / T0 * np.power((1 - L * h / T0), (g * M / R / L - 1))
 
     V = 0.001 * np.ones((samples, 1))
-    a = np.zeros((samples, 1))
+    a = np.zeros(3, )
 
     # m = 2.8e6 * np.ones((samples, 1))
     # h = np.zeros((samples, 1))
@@ -147,33 +147,40 @@ def rocket_trajectory(t, state, mu=pd.earth['mu']):
     dm = 0
     if t < initial_turn:
         dm = -2e4
-        a[1] = -g + dm * ue/ m
-        a[0] = 0
+        aa = -g + abs(dm) * ue / m
+        a = aa * r / np.linalg.norm(r)
+
     elif t == initial_turn:
         dm = -2e4
         # m = dm
         theta = .1
         V = np.sqrt(np.power(Vx, 2) + np.power(Vy, 2))
-        aa = dm * ue / m
-        a[1] = -g + aa * np.cos(theta)
-        a[0] = aa * np.sin(theta)
+        aa = abs(dm) * ue / m
+        a = aa * r / np.linalg.norm(r)
+        # a[1] = -g + aa * np.cos(theta)
+        # a[0] = aa * np.sin(theta)
     elif t < engine_cutoff:
         dm = -2e4
         theta = np.arctan2(abs(Vy * dt), abs(Vx * dt))
-        aa = dm * ue / m
-        a[1] = -g + aa * np.cos(theta)
-        a[0] = aa * np.sin(theta)
+        aa =  abs(dm) * ue / m
+        # a[1] = -g + aa * np.cos(theta)
+        # a[0] = aa * np.sin(theta)
+        a = aa * r / np.linalg.norm(r)
     else:
         dm = 0
         a = -mu * r / np.linalg.norm(r) ** 3
+    a = -mu * r / np.linalg.norm(r) ** 3
+    new_states = np.array([
+        state[3], state[4], state[5],
+        a[0], a[1], a[2], dm])
 
+    # print('new states', new_states)
     # return np.array([
     #     state[3], state[4], state[5],
     #     a[0], a[1], a[2], dm])
-    a = -mu * r / np.linalg.norm(r) ** 3
-    return np.array([
-        state[3], state[4], state[5],
-        a[0], a[1], a[2], dm])
+    # a = -mu * r / np.linalg.norm(r) ** 3
+    # print('after', a)
+    return new_states
 
 
 def calc_close_approach(turn_angle, v_inf, mu=pd.sun['mu']):
